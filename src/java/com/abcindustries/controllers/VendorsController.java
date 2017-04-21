@@ -69,9 +69,9 @@ public class VendorsController {
             String sql = "";
             Connection conn = DBUtils.getConnection();
             if (p.getVendorId() <= 0) {
-                sql = "INSERT INTO Vendor (Name, ContactName, PhoneNumber) VALUES (?, ?, s?)";
+                sql = "INSERT INTO Vendors (Name, ContactName, PhoneNumber) VALUES (?, ?, ?)";
             } else {
-                sql = "UPDATE Vendor SET Name = ?, ContactName = ?,PhoneNumber = ? WHERE VendorId = ?";
+                sql = "UPDATE Vendors SET Name = ?, ContactName = ?,PhoneNumber = ? WHERE VendorId = ?";
             }
             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, p.getName());
