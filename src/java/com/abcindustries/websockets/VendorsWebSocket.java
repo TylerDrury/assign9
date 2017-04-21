@@ -15,11 +15,66 @@
  */
 package com.abcindustries.websockets;
 
+import com.abcindustries.controllers.VendorsController;
+import java.io.IOException;
+import java.io.StringReader;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.websocket.OnMessage;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
 /**
  *
- * @author <ENTER YOUR NAME HERE>
+ * @author Tyler Drury
  */
+@ServerEndpoint("/vendorsSocket")
+@ApplicationScoped
 public class VendorsWebSocket {
+@Inject
+    VendorsController vendors;
 
-    // TODO: Model this after the ProductsWebSocket
+    @OnMessage
+    public void onMessage(String message, Session session) throws IOException {
+        String output = "";
+        JsonObject json = Json.createReader(new StringReader(message)).readObject();
+        if (json.containsKey("get")) {
+            if (json.containsKey("id")) {
+                 output = vendors.getByIdJson(json.getInt("id")).toString();
+            }
+            else if (json.getString("get").equals("vendors")) {
+                output = vendors.getAllJson().toString();
+            }
+           else if (json.containsKey("search")) {
+                 output = vendors.getBySearchJson(json.getString("search")).toString();
+            }
+           else output = vendors.getAllJson().toString();
+            
+        } else if (json.containsKey("post") && json.getString("post").equals("vendors")) {
+            JsonObject vendorJson = json.getJsonObject("data");
+            vendors.addJson(vendorJson);
+            output = vendors.getAllJson().toString();
+        }
+        else if (json.containsKey("put") && json.getString("put").equals("vendors")) {
+            JsonObject vendorJson = json.getJsonObject("data");
+            vendors.editJson(vendorJson.getInt("vendorId"),vendorJson);
+            output = vendors.getAllJson().toString();
+        } 
+            else if (json.containsKey("delete") && json.getString("delete").equals("vendors")) {
+            int id = json.getInt("id");
+            vendors.delete(id);
+            output = vendors.getAllJson().toString();
+        } 
+       
+        else {
+            output = Json.createObjectBuilder()
+                    .add("error", "Invalid Request")
+                    .add("original", json)
+                    .build().toString();
+        }
+
+        session.getBasicRemote().sendText(output);
+    }
 }

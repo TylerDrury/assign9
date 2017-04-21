@@ -28,7 +28,7 @@ import javax.websocket.server.ServerEndpoint;
 
 /**
  *
- * @author <ENTER YOUR NAME HERE>
+ * @author Tyler
  */
 @ServerEndpoint("/productsSocket")
 @ApplicationScoped
