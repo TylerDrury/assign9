@@ -21,9 +21,9 @@
  =================================================================*/
 
 $(document).ready(function () {
-    var productsWsUri = "ws://localhost:8080/CPD4414-Final-2016W/productsSocket";
+    var productsWsUri = "ws://localhost:8080/CSD4464-Assign9/productsSocket";
     var pws = new WebSocket(productsWsUri);
-    var vendorsWsUri = "ws://localhost:8080/CPD4414-Final-2016W/vendorsSocket";
+    var vendorsWsUri = "ws://localhost:8080/CSD4464-Assign9/vendorsSocket";
     var vws = new WebSocket(vendorsWsUri);
 
     pws.onmessage = function (evt) {

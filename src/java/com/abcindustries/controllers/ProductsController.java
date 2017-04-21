@@ -18,7 +18,10 @@ package com.abcindustries.controllers;
 import com.abcindustries.entities.Product;
 import com.abcindustries.utilities.DBUtils;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
@@ -41,7 +44,21 @@ public class ProductsController {
     }
 
     public void retrieveAllProducts() {
-        // TODO: Make a call that retrieves all the Products from the Database
+        try {
+            productList = new ArrayList<>();
+            Connection conn = DBUtils.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Products");
+            while (rs.next()) {
+                Product p = new Product();
+                p.setProductId(rs.getInt("ProductId"));
+                p.setName(rs.getString("Name"));
+                p.setVendorId(rs.getInt("VendorId"));
+                productList.add(p);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductsController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void persistToDb(Product p) {
@@ -73,7 +90,16 @@ public class ProductsController {
     }
 
     public void removeFromDb(Product p) {
-        // TODO: Make a call that deletes a single Product from the database
+       try {
+            String sql = "DELETE FROM Products WHERE ProductId = ?";
+            Connection conn = DBUtils.getConnection();        
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, p.getProductId());
+            pstmt.executeUpdate();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductsController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public List<Product> getAll() {
@@ -81,8 +107,12 @@ public class ProductsController {
     }
 
     public JsonArray getAllJson() {
-        // TODO: Build a JsonArray object from the List
-        return null;
+       JsonArrayBuilder arr = Json.createArrayBuilder();
+         for (Product p : productList) {
+         arr.add(p.toJson());
+         }
+         
+        return arr.build();
     }
 
     public Product getById(int id) {
@@ -117,12 +147,17 @@ public class ProductsController {
     }
 
     public JsonObject editJson(int id, JsonObject json) {
-        // TODO: Input the JsonObject at the specified id if it already exists
+        Product p = getById(id);
+        p.setName(json.getString("name"));
+        p.setVendorId(json.getInt("vendorId"));
+        persistToDb(p);
         return null;
     }
 
     public JsonObject delete(int id) {
-        // TODO: Remember to delete from both the List and the DB
+         Product p = getById(id);
+         removeFromDb(p);
+         productList.remove(p);
         return null;
     }
 }

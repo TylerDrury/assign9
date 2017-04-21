@@ -50,12 +50,17 @@ public class ProductsREST {
     @Path("{id}")
     @Produces("application/json")
     public Response getById(@PathParam("id") int id) {
-        // TODO: Use controller's getByIdJson method to get a Product's JsonObject
-        return null;
+       return Response.ok(products.getByIdJson(id)).build();
+        
     }
     
     // TODO: Create an @GET block on the /search/{query} path that searches by a query string
-
+    @GET
+    @Path("/search/{query}")
+    @Produces("application/json")
+    public Response getBySearch(@PathParam("query") String query) {
+       return Response.ok(products.getBySearchJson(query)).build();      
+    }
     @POST
     @Consumes("application/json")
     @Produces("application/json")
@@ -68,14 +73,13 @@ public class ProductsREST {
     @Consumes("application/json")
     @Produces("application/json")
     public Response set(@PathParam("id") int id, JsonObject json) {
-        // TODO: Use controller's editJson method
-        return null;
+         return Response.ok(products.editJson(id,json)).build();
+        
     }
 
     @DELETE
     @Path("{id}")
     public Response set(@PathParam("id") int id) {
-        // TODO: Use controller's delete method
-        return null;
+        return Response.ok(products.delete(id)).build();
     }
 }

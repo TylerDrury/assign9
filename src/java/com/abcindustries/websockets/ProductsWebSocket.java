@@ -43,14 +43,35 @@ public class ProductsWebSocket {
         String output = "";
         JsonObject json = Json.createReader(new StringReader(message)).readObject();
         if (json.containsKey("get")) {
-            if (json.getString("get").equals("products")) {
+            if (json.containsKey("id")) {
+                 output = products.getByIdJson(json.getInt("id")).toString();
+            }
+            else if (json.getString("get").equals("products")) {
                 output = products.getAllJson().toString();
             }
+           else if (json.containsKey("search")) {
+                 output = products.getBySearchJson(json.getString("search")).toString();
+            }
+           else output = products.getAllJson().toString();
+            //get byid ,get by search,
+           
+            
         } else if (json.containsKey("post") && json.getString("post").equals("products")) {
             JsonObject productJson = json.getJsonObject("data");
             products.addJson(productJson);
             output = products.getAllJson().toString();
+        }
+        else if (json.containsKey("put") && json.getString("put").equals("products")) {
+            JsonObject productJson = json.getJsonObject("data");
+            products.editJson(productJson.getInt("productId"),productJson);
+            output = products.getAllJson().toString();
+        } 
+            else if (json.containsKey("delete") && json.getString("delete").equals("products")) {
+            int id = json.getInt("id");
+            products.delete(id);
+            output = products.getAllJson().toString();
         } // TODO: Capture all the other messages defined on the WebSockets API
+       
         else {
             output = Json.createObjectBuilder()
                     .add("error", "Invalid Request")
@@ -58,7 +79,7 @@ public class ProductsWebSocket {
                     .build().toString();
         }
 
-        // TODO: Return the output string to the user that sent the message
+        session.getBasicRemote().sendText(output);
     }
 
 }

@@ -15,11 +15,15 @@
  */
 package com.abcindustries.rest;
 
+import com.abcindustries.controllers.VendorsController;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -27,38 +31,55 @@ import javax.ws.rs.core.Response;
 
 /**
  *
- * @author <ENTER YOUR NAME HERE>
+ * @author TylerDrury
  */
 @Path("vendors")
 @RequestScoped
 public class VendorsREST {
-    // TODO: Inject the Controller
-    
+
+    @Inject
+    VendorsController vendors;
+
     @GET
     @Produces("application/json")
     public Response getAll() {
-        // TODO: Use controller's method to retrieve a full JSON array
-        return null;
+        return Response.ok(vendors.getAllJson()).build();
     }
-    
+
     @GET
     @Path("{id}")
     @Produces("application/json")
     public Response getById(@PathParam("id") int id) {
-        // TODO: Use controller's getByIdJson method to get a Vendor by ID
-        return null;
+        return Response.ok(vendors.getByIdJson(id)).build();
+
     }
-    
+
     //TODO: GET /vendors/search/{query}
+    @GET
+    @Path("/search/{query}")
+    @Produces("application/json")
+    public Response getBySearch(@PathParam("query") String query) {
+        return Response.ok(vendors.getBySearchJson(query)).build();
+    }
 
     @POST
     @Consumes("application/json")
     public Response add(JsonObject json) {
-        // TODO: Use controller's addJson method
-        return null;
+       return Response.ok(vendors.addJson(json)).build();
     }
-    
-    //TODO: PUT /vendors/{id}
-    
-    //TODO: DELETE /vendors/{id}
+
+     @PUT
+    @Path("{id}")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response set(@PathParam("id") int id, JsonObject json) {
+         return Response.ok(vendors.editJson(id,json)).build();
+        
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Response set(@PathParam("id") int id) {
+        return Response.ok(vendors.delete(id)).build();
+    }
 }
